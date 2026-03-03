@@ -15,6 +15,7 @@ const generateAccessTokenAndRefreshToken = async (userId)=>{
     await user.save({validateBeforeSave: false});
     return { accessToken, refreshToken };
   } catch (error) {
+    console.error("Error generating tokens:", error);
     throw new apiError(
       500,
       "Something went wrong while generating access and refresh tokens"
@@ -82,6 +83,10 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
 
   const { username, email, password } = req.body;
+
+  if (!(username || email)){
+    throw new apiError(400, "username or email is required")
+  }
 
   const user = await User.findOne({
     $or: [{ username }, { email }],
